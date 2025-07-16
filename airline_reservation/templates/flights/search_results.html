@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Flight Search Results - SkyReserve{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h2 class="mb-4">Search Results</h2>
+        
+        <!-- Search Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="{% url 'flights:search' %}" method="get" class="row">
+                    <div class="col-md-3 mb-2">
+                        <label for="origin">From</label>
+                        <select name="origin" id="origin" class="form-control">
+                            <option value="">Any Origin</option>
+                            {% for airport in view.request.airports %}
+                                <option value="{{ airport.code }}" {% if request.GET.origin == airport.code %}selected{% endif %}>
+                                    {{ airport.city }} ({{ airport.code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="destination">To</label>
+                        <select name="destination" id="destination" class="form-control">
+                            <option value="">Any Destination</option>
+                            {% for airport in view.request.airports %}
+                                <option value="{{ airport.code }}" {% if request.GET.destination == airport.code %}selected{% endif %}>
+                                    {{ airport.city }} ({{ airport.code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="departure_date">Departure Date</label>
+                        <input type="date" name="departure_date" id="departure_date" class="form-control" 
+                               value="{{ request.GET.departure_date|default:'' }}">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end mb-2">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-filter mr-2"></i>Apply Filters
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Search Results -->
+        <div class="row">
+            {% for flight in flights %}
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h5>{{ flight.airline.name }} {{ flight.flight_number }}</h5>
+                                    <p class="text-muted mb-1">{{ flight.aircraft.model }}</p>
+                                    {% if flight.status == 'On Time' %}
+                                        <span class="badge badge-success">{{ flight.status }}</span>
+                                    {% elif flight.status == 'Delayed' %}
+                                        <span class="badge badge-warning">{{ flight.status }}</span>
+                                    {% elif flight.status == 'Cancelled' %}
+                                        <span class="badge badge-danger">{{ flight.status }}</span>
+                                    {% else %}
+                                        <span class="badge badge-info">{{ flight.status }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-center">
+                                            <h5 class="mb-0">{{ flight.origin.code }}</h5>
+                                            <p class="mb-0">{{ flight.departure_time|time:"H:i" }}</p>
+                                            <small>{{ flight.departure_time|date:"M d, Y" }}</small>
+                                        </div>
+                                        <div class="text-center">
+                                            <i class="fas fa-plane fa-2x text-primary"></i>
+                                            <p>{{ flight.duration }}</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <h5 class="mb-0">{{ flight.destination.code }}</h5>
+                                            <p class="mb-0">{{ flight.arrival_time|time:"H:i" }}</p>
+                                            <small>{{ flight.arrival_time|date:"M d, Y" }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <small>{{ flight.origin.city }} to {{ flight.destination.city }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-right">
+                                    <div class="mb-2">
+                                        <span class="h5 text-success">${{ flight.economy_price }}</span>
+                                        <small class="text-muted">Economy</small>
+                                    </div>
+                                    <a href="{% url 'flights:flight_detail' flight.id %}" class="btn btn-outline-primary">View Details</a>
+                                    <a href="{% url 'bookings:book_flight' flight.id %}" class="btn btn-primary">Book Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>No flights found matching your criteria. Please try different search parameters.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

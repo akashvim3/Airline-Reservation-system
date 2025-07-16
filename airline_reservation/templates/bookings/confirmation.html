@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmation{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-check-circle mr-2"></i>Booking Confirmed!
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="display-4 text-success mb-3">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <h3>Thank you for booking with SkyReserve!</h3>
+                            <p class="lead">Your booking has been confirmed and is ready for travel.</p>
+                            <div class="alert alert-info">
+                                <strong>Booking Reference:</strong> {{ booking.booking_reference }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h5>Flight Details</h5>
+                                <table class="table">
+                                    <tr>
+                                        <th>Flight:</th>
+                                        <td>{{ booking.flight.airline.name }} {{ booking.flight.flight_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Route:</th>
+                                        <td>{{ booking.flight.origin.city }} ({{ booking.flight.origin.code }}) to 
+                                            {{ booking.flight.destination.city }} ({{ booking.flight.destination.code }})</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date & Time:</th>
+                                        <td>{{ booking.flight.departure_time|date:"M d, Y - H:i" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Passenger:</th>
+                                        <td>{{ booking.passenger.first_name }} {{ booking.passenger.last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Seat Class:</th>
+                                        <td>
+                                            {% if booking.seat_class == 'E' %}
+                                                Economy
+                                            {% elif booking.seat_class == 'B' %}
+                                                Business
+                                            {% else %}
+                                                First Class
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Seat Number:</th>
+                                        <td>{{ booking.seat_number|default:"To be assigned" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount Paid:</th>
+                                        <td>${{ booking.amount_paid }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Payment Status:</th>
+                                        <td>
+                                            {% if booking.payment_status == 'C' %}
+                                                <span class="badge badge-success">Completed</span>
+                                            {% elif booking.payment_status == 'P' %}
+                                                <span class="badge badge-warning">Pending</span>
+                                            {% elif booking.payment_status == 'F' %}
+                                                <span class="badge badge-danger">Failed</span>
+                                            {% else %}
+                                                <span class="badge badge-info">Refunded</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-primary mr-2">
+                                <i class="fas fa-list-alt mr-2"></i>View All Bookings
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary" onclick="window.print();">
+                                <i class="fas fa-print mr-2"></i>Print Confirmation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

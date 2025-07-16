@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Book Flight - {{ flight.flight_number }}{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Book Flight: {{ flight.airline.name }} {{ flight.flight_number }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="flight-summary mb-4">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <h5>{{ flight.origin.code }}</h5>
+                                    <p class="mb-0">{{ flight.departure_time|time:"H:i" }}</p>
+                                    <small>{{ flight.departure_time|date:"M d, Y" }}</small>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <i class="fas fa-plane fa-2x text-primary"></i>
+                                    <p>{{ flight.duration }}</p>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <h5>{{ flight.destination.code }}</h5>
+                                    <p class="mb-0">{{ flight.arrival_time|time:"H:i" }}</p>
+                                    <small>{{ flight.arrival_time|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <h5 class="mb-3">Passenger Information</h5>
+                            {{ passenger_form|crispy }}
+                            
+                            <h5 class="mt-4 mb-3">Booking Details</h5>
+                            {{ booking_form|crispy }}
+                            
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-check-circle mr-2"></i>Complete Booking
+                                </button>
+                                <a href="{% url 'flights:flight_detail' flight.id %}" class="btn btn-outline-secondary btn-lg ml-2">
+                                    <i class="fas fa-arrow-left mr-2"></i>Back to Flight Details
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Price Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="seat_class_display" id="economy" checked>
+                                <label class="form-check-label" for="economy">
+                                    Economy - ${{ flight.economy_price }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="seat_class_display" id="business">
+                                <label class="form-check-label" for="business">
+                                    Business - ${{ flight.business_price }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="seat_class_display" id="first_class">
+                                <label class="form-check-label" for="first_class">
+                                    First Class - ${{ flight.first_class_price }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <span>Base Fare:</span>
+                            <span id="base_fare">${{ flight.economy_price }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Taxes & Fees:</span>
+                            <span>${{ flight.economy_price|floatformat:2|multiply:0.1 }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total:</strong>
+                            <strong id="total_price">${{ flight.economy_price|floatformat:2|add:flight.economy_price|floatformat:2|multiply:0.1 }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Important Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="small">
+                            <li>Please ensure passenger details match official travel documents.</li>
+                            <li>Baggage allowance varies by seat class.</li>
+                            <li>Check-in opens 24 hours before departure.</li>
+                            <li>Flight changes may incur additional fees.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const economyRadio = document.getElementById('economy');
+            const businessRadio = document.getElementById('business');
+            const firstClassRadio = document.getElementById('first_class');
+            const baseFare = document.getElementById('base_fare');
+            const totalPrice = document.getElementById('total_price');
+            const seatClassSelect = document.getElementById('id_seat_class');
+            
+            const economyPrice = {{ flight.economy_price }};
+            const businessPrice = {{ flight.business_price }};
+            const firstClassPrice = {{ flight.first_class_price }};
+            
+            function updatePrice(price) {
+                const taxFee = price * 0.1;
+                const total = price + taxFee;
+                
+                baseFare.textContent = '$' + price.toFixed(2);
+                totalPrice.textContent = '$' + total.toFixed(2);
+            }
+            
+            economyRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    seatClassSelect.value = 'E';
+                    updatePrice(economyPrice);
+                }
+            });
+            
+            businessRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    seatClassSelect.value = 'B';
+                    updatePrice(businessPrice);
+                }
+            });
+            
+            firstClassRadio.addEventListener('change', function() {
+                if(this.checked) {
+                    seatClassSelect.value = 'F';
+                    updatePrice(firstClassPrice);
+                }
+            });
+            
+            // Initialize with default value
+            updatePrice(economyPrice);
+        });
+    </script>
+    {% endblock %}
+{% endblock %}

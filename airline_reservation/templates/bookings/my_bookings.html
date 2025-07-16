@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - SkyReserve{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Bookings</h2>
+            <a href="{% url 'flights:home' %}" class="btn btn-primary">
+                <i class="fas fa-plus mr-2"></i>Book New Flight
+            </a>
+        </div>
+        
+        {% if bookings %}
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Your Flight Bookings</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Booking Ref</th>
+                                    <th>Flight</th>
+                                    <th>Route</th>
+                                    <th>Date</th>
+                                    <th>Passenger</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{ booking.booking_reference }}</td>
+                                        <td>{{ booking.flight.airline.name }} {{ booking.flight.flight_number }}</td>
+                                        <td>{{ booking.flight.origin.code }} → {{ booking.flight.destination.code }}</td>
+                                        <td>{{ booking.flight.departure_time|date:"M d, Y" }}</td>
+                                        <td>{{ booking.passenger.first_name }} {{ booking.passenger.last_name }}</td>
+                                        <td>
+                                            {% if booking.flight.status == 'On Time' %}
+                                                <span class="badge badge-success">{{ booking.flight.status }}</span>
+                                            {% elif booking.flight.status == 'Delayed' %}
+                                                <span class="badge badge-warning">{{ booking.flight.status }}</span>
+                                            {% elif booking.flight.status == 'Cancelled' %}
+                                                <span class="badge badge-danger">{{ booking.flight.status }}</span>
+                                            {% else %}
+                                                <span class="badge badge-info">{{ booking.flight.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'bookings:booking_confirmation' booking.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle mr-2"></i>You don't have any bookings yet. 
+                <a href="{% url 'flights:home' %}">Book a flight now!</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login - SkyReserve{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 text-center"><i class="fas fa-plane-departure me-2"></i>Welcome Back to SkyReserve</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary py-2 fw-bold">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-2">Don't have an account? <a href="{% url 'accounts:register' %}" class="text-primary fw-bold">Register now</a></p>
+                        <p class="mb-0"><a href="{% url 'accounts:password_reset' %}" class="text-secondary">
+                            <i class="fas fa-key me-1"></i>Forgot your password?</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3 text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-lock me-1"></i>Secure login powered by SkyReserve
+                    </small>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="social-login mx-2">
+                        <a href="#" class="btn btn-outline-secondary rounded-circle">
+                            <i class="fab fa-google"></i>
+                        </a>
+                    </div>
+                    <div class="social-login mx-2">
+                        <a href="#" class="btn btn-outline-secondary rounded-circle">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                    <div class="social-login mx-2">
+                        <a href="#" class="btn btn-outline-secondary rounded-circle">
+                            <i class="fab fa-apple"></i>
+                        </a>
+                    </div>
+                </div>
+                <p class="mt-2 text-muted small">Or sign in with social accounts</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

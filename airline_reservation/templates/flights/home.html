@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}SkyReserve - Book Your Flights{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 text-center">
+                    <h1 class="display-4 mb-4">Your Journey Begins with SkyReserve</h1>
+                    <p class="lead mb-5">Book flights to hundreds of destinations worldwide with our easy-to-use reservation system.</p>
+                </div>
+            </div>
+            
+            <!-- Flight Search Form -->
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1">
+                    <div class="search-box">
+                        <form action="{% url 'flights:search' %}" method="get">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="origin"><i class="fas fa-plane-departure mr-2"></i>From</label>
+                                    <select name="origin" id="origin" class="form-control" required>
+                                        <option value="">Select origin</option>
+                                        {% for airport in airports %}
+                                            <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="destination"><i class="fas fa-plane-arrival mr-2"></i>To</label>
+                                    <select name="destination" id="destination" class="form-control" required>
+                                        <option value="">Select destination</option>
+                                        {% for airport in airports %}
+                                            <option value="{{ airport.code }}">{{ airport.city }} ({{ airport.code }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="departure_date"><i class="far fa-calendar-alt mr-2"></i>Departure Date</label>
+                                    <input type="date" name="departure_date" id="departure_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-search mr-2"></i>Search Flights
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Flights Section -->
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Featured Flights</h2>
+        <div class="row">
+            {% for flight in featured_flights %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">{{ flight.airline.name }} {{ flight.flight_number }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ flight.origin.city }} ({{ flight.origin.code }}) to 
+                                {{ flight.destination.city }} ({{ flight.destination.code }})
+                            </h6>
+                            <p class="card-text">
+                                <i class="far fa-clock mr-2"></i>{{ flight.departure_time|date:"M d, Y - H:i" }}<br>
+                                <i class="fas fa-hourglass-half mr-2"></i>Duration: {{ flight.duration }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge badge-success p-2">From ${{ flight.economy_price }}</span>
+                                <a href="{% url 'flights:flight_detail' flight.id %}" class="btn btn-outline-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p>No featured flights available at the moment.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="container my-5">
+        <h2 class="text-center mb-4">Why Choose SkyReserve?</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tag fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Best Prices</h5>
+                        <p class="card-text">We offer competitive prices and regular promotions to ensure you get the best deal on your flights.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Secure Booking</h5>
+                        <p class="card-text">Our booking system uses the latest security measures to protect your personal and payment information.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-headset fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">24/7 Support</h5>
+                        <p class="card-text">Our customer service team is available round the clock to assist you with any queries or issues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
