@@ -65,7 +65,7 @@ A web-based Airline Reservation System built with the Django framework. This sys
 
 📁 Project Structure
 
-airline_reservation_system/
+ airline_reservation_system/
 │
 ├── airline/               # Django app for core functionality
 ├── users/                 # Django app for user registration/login
@@ -73,6 +73,7 @@ airline_reservation_system/
 ├── static/                # Static files (CSS, JS, Images)
 ├── manage.py
 └── requirements.txt
+
 
 ✍️ Contributing
 
